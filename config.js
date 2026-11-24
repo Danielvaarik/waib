@@ -4,5 +4,5 @@ window.WAIB = {
   // Serverifunktsiooni aadress, kujul https://SINU-PROJEKT.supabase.co/functions/v1/waib
   API: "",
   // Google'i sisselogimise kliendi ID, kujul 1234567890-abc.apps.googleusercontent.com
-  GOOGLE_CLIENT_ID: ""
+  GOOGLE_CLIENT_ID: "784807249798-off0c4no89ehq72hcued8e9pvf6u7tl6.apps.googleusercontent.com"
 };
