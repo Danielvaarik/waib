@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="et"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Waib · toimetaja</title>
+<style>
+:root{--bg:#f3f1ec;--card:#fffdf8;--ink:#1d1d1f;--mut:#6b6a66;--line:#dcd8cf;--pos:#2f7d5b;--neg:#b5523b;--acc:#2c4a7a}
+@media (prefers-color-scheme:dark){:root{--bg:#17181a;--card:#222326;--ink:#ecebe7;--mut:#a09e97;--line:#3a3b3f;--pos:#5fb38a;--neg:#e0826a;--acc:#8fb0e6}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:26px 0 8px}
+.mut{color:var(--mut);font-size:13px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin:8px 0 3px}
+input,select,textarea,button{font:inherit;color:var(--ink)}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+textarea{resize:vertical;min-height:60px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+button{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer}
+button.pri{background:var(--acc);border-color:var(--acc);color:var(--bg);font-weight:600}
+button.sm{padding:4px 9px;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}.row>div{flex:1;min-width:150px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 10px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:7px 6px;border-top:1px solid var(--line)}th{font-size:12px;color:var(--mut);border-top:0}
+.cardhd{display:flex;justify-content:space-between;align-items:center;gap:8px}.cardhd b{font-size:15px}
+.err{color:var(--neg);font-weight:600}.ok{color:var(--pos);font-weight:600}
+.cnt{float:right;font-weight:400}.cnt.long{color:var(--neg)}
+.chk{display:flex;align-items:center;gap:8px;margin-top:10px}.chk input{width:auto}
+[hidden]{display:none!important}
+</style></head><body><main>
+<h1>Waib · toimetaja</h1>
+<p class="mut">Siin sisestad ja avaldad nädala kaardid. Toimetaja võtit ei salvestata: see püsib ainult selle lehe mälus kuni sulgemiseni.</p>
+
+<div class="box" id="loginbox">
+ <form id="loginform" class="row">
+  <div><label for="tok">Toimetaja võti</label><input id="tok" type="password" autocomplete="off"></div>
+  <button class="pri" type="submit">Ava</button>
+ </form>
+ <p id="loginmsg" class="err" role="alert"></p>
+</div>
+
+<div id="work" hidden>
+ <h2>Komplektid</h2>
+ <div class="box"><table><thead><tr><th>Tunnus</th><th>Silt</th><th>Olek</th><th>Avaneb</th><th>Kaarte</th><th>Vastuseid</th><th></th></tr></thead><tbody id="sets"></tbody></table>
+ <div class="row" style="margin-top:10px"><button id="newset">Uus komplekt</button><button id="reload">Värskenda</button></div></div>
+
+ <div id="editor" hidden>
+  <h2 id="edtitle">Komplekt</h2>
+  <div class="box">
+   <div class="g3">
+    <div><label for="sid">Tunnus (nt 2026-W49)</label><input id="sid" maxlength="40"></div>
+    <div><label for="slabel">Silt, mida kasutaja näeb</label><input id="slabel" placeholder="49. nädal · 30. nov – 4. dets 2026"></div>
+    <div><label for="sopen">Avaneb</label><input id="sopen" type="datetime-local"></div>
+   </div>
+   <div class="chk"><input id="spub" type="checkbox"><label for="spub" style="margin:0;font-size:14px;color:var(--ink)">Avaldatud (nähtav alates avanemise ajast)</label></div>
+   <p class="mut" id="lockmsg" hidden>Sellele komplektile on juba vastatud. Kaarte ei saa enam lisada, eemaldada ega nende tunnuseid muuta; sõnastust võib parandada.</p>
+  </div>
+  <div id="cards"></div>
+  <div class="row" style="margin-top:12px">
+   <button id="addcard">Lisa kaart</button><button id="imp">Impordi JSON</button><button id="exp">Ekspordi JSON</button>
+   <button class="pri" id="savebtn" style="margin-left:auto">Salvesta</button>
+  </div>
+  <p id="savemsg" role="status"></p>
+  <div class="box" id="jsonbox" hidden><label for="jsonta">Kaardid JSON-kujul</label><textarea id="jsonta" style="min-height:180px;font:12px ui-monospace,monospace"></textarea>
+   <div class="row" style="margin-top:8px"><button id="jsonapply">Võta need kaardid kasutusele</button><button id="jsonclose">Sulge</button></div></div>
+ </div>
+</div>
+</main>
+<script src="config.js"></script>
+<script>
+const API=String((window.WAIB||{}).API||'').trim();
+const TAGS=["Majandus","Kultuur","IT","Energeetika","Haridus","Riigikaitse","Sotsiaalpoliitika","Välispoliitika","Riigijuhtimine"];
+const GROUPS=[["v","Valitsus"],["o","Opositsioon"],["m","Parteitu, ekspert või muu"]];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let token='',cards=[],locked=false,isNew=true;
+
+async function api(body){
+ const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({admin_token:token},body))});
+ let j=null;try{j=await r.json()}catch(e){}
+ if(!j)throw new Error('Server ei vastanud (HTTP '+r.status+').');
+ return j;
+}
+const ERR={forbidden:'Vale toimetaja võti.',not_configured:'Serveris on toimetaja võti (WAIB_ADMIN_TOKEN) seadistamata või liiga lühike.',server:'Serveri viga. Vaata funktsiooni logi.',bad_request:'Vigane päring.'};
+
+$('loginform').onsubmit=async e=>{
+ e.preventDefault();$('loginmsg').textContent='';
+ if(!API){$('loginmsg').textContent='Failis config.js on serveri aadress (API) määramata.';return}
+ token=$('tok').value.trim();
+ if(await loadSets()){$('loginbox').hidden=true;$('work').hidden=false;$('tok').value=''}
+};
+async function loadSets(){
+ try{
+  const j=await api({action:'admin_list'});
+  if(j.error){$('loginmsg').textContent=ERR[j.error]||j.error;return false}
+  $('sets').innerHTML=(j.sets||[]).map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.label)}</td><td>${s.published?'avaldatud':'mustand'}</td><td>${esc(fmt(s.opens_at))}</td><td>${esc(s.cards)}</td><td>${esc(s.answers)}</td><td><button class="sm" data-open="${esc(s.id)}">Ava</button></td></tr>`).join('')||'<tr><td colspan="7" class="mut">Komplekte veel ei ole.</td></tr>';
+  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openSet(b.dataset.open));
+  return true;
+ }catch(e){$('loginmsg').textContent=e.message;return false}
+}
+const fmt=iso=>{const d=new Date(iso);return isNaN(d)?'':d.toLocaleString('et-EE',{dateStyle:'short',timeStyle:'short'})};
+const toLocal=iso=>{const d=iso?new Date(iso):new Date();if(isNaN(d))return '';const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`};
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=t.getUTCFullYear();const w=Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7);return y+'-W'+String(w).padStart(2,'0')}
+
+$('reload').onclick=loadSets;
+$('newset').onclick=()=>{isNew=true;locked=false;cards=[];showEditor({id:isoWeek(new Date()),label:'',opens_at:null,published:false})};
+async function openSet(id){
+ const j=await api({action:'admin_get',set_id:id});
+ if(!j.set){alertMsg('Komplekti ei leitud.',true);return}
+ isNew=false;locked=(j.set.answers||0)>0;cards=(j.set.cards||[]).map(c=>Object.assign({},c));showEditor(j.set);
+}
+function showEditor(s){
+ $('editor').hidden=false;$('edtitle').textContent=isNew?'Uus komplekt':'Komplekt '+s.id;
+ $('sid').value=s.id;$('sid').readOnly=!isNew;$('slabel').value=s.label||'';$('sopen').value=toLocal(s.opens_at);$('spub').checked=!!s.published;
+ $('lockmsg').hidden=!locked;$('addcard').disabled=locked;$('imp').disabled=locked;$('savemsg').textContent='';$('jsonbox').hidden=true;
+ renderCards();$('editor').scrollIntoView({behavior:'smooth'});
+}
+function slug(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,24)||'kaart'}
+function uniqueId(base,skip){let id=base,n=2;while(cards.some((c,k)=>k!==skip&&c.id===id))id=base+'-'+n++;return id}
+function renderCards(){
+ $('cards').innerHTML=cards.map((c,k)=>`<div class="box" data-k="${k}">
+  <div class="cardhd"><b>${k+1}. ${esc(c.name||'Uus kaart')}</b><span>
+   <button class="sm" data-act="up" ${k===0?'disabled':''} aria-label="Liiguta üles">↑</button>
+   <button class="sm" data-act="down" ${k===cards.length-1?'disabled':''} aria-label="Liiguta alla">↓</button>
+   <button class="sm" data-act="del" ${locked?'disabled':''}>Eemalda</button></span></div>
+  <div class="g3">
+   <div><label for="n${k}">Nimi</label><input id="n${k}" data-f="name" value="${esc(c.name)}"></div>
+   <div><label for="r${k}">Amet või roll</label><input id="r${k}" data-f="role" value="${esc(c.role)}"></div>
+   <div><label for="t${k}">Teema</label><select id="t${k}" data-f="tag">${TAGS.map(t=>`<option${t===c.tag?' selected':''}>${esc(t)}</option>`).join('')}</select></div>
+   <div><label for="g${k}">Leer</label><select id="g${k}" data-f="g">${GROUPS.map(([v,l])=>`<option value="${v}"${v===c.g?' selected':''}>${esc(l)}</option>`).join('')}</select></div>
+   <div><label for="p${k}">Erakond (võib jääda tühjaks)</label><input id="p${k}" data-f="p" value="${esc(c.p)}"></div>
+   <div><label for="i${k}">Kaardi tunnus</label><input id="i${k}" data-f="id" value="${esc(c.id)}" ${locked?'readonly':''} maxlength="40"></div>
+  </div>
+  <label for="c${k}">Väide lihtsas keeles <span class="cnt ${String(c.claim||'').length>170?'long':''}" id="cc${k}">${String(c.claim||'').length} / 170</span></label>
+  <textarea id="c${k}" data-f="claim">${esc(c.claim)}</textarea>
+  <label for="x${k}">Taust (paar lauset)</label><textarea id="x${k}" data-f="ctx">${esc(c.ctx)}</textarea>
+  <div class="g3">
+   <div><label for="d${k}">Kuupäev (nt 27.11)</label><input id="d${k}" data-f="date" value="${esc(c.date)}"></div>
+   <div><label for="s${k}">Allika nimi</label><input id="s${k}" data-f="src" value="${esc(c.src)}"></div>
+   <div><label for="u${k}">Link (https://…)</label><input id="u${k}" data-f="url" type="url" value="${esc(c.url)}"></div>
+  </div></div>`).join('')||'<p class="mut">Kaarte veel ei ole. Lisa kaart või impordi JSON.</p>';
+}
+$('cards').addEventListener('input',e=>{
+ const box=e.target.closest('[data-k]');if(!box||!e.target.dataset.f)return;
+ const k=+box.dataset.k,f=e.target.dataset.f;cards[k][f]=e.target.value;
+ if(f==='claim'){const el=$('cc'+k);el.textContent=e.target.value.length+' / 170';el.classList.toggle('long',e.target.value.length>170)}
+ if(f==='name'){box.querySelector('.cardhd b').textContent=(k+1)+'. '+(e.target.value||'Uus kaart');
+  if(!locked&&cards[k]._auto){cards[k].id=uniqueId(slug(e.target.value),k);$('i'+k).value=cards[k].id}}
+ if(f==='id')cards[k]._auto=false;
+});
+$('cards').addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;const k=+b.closest('[data-k]').dataset.k,a=b.dataset.act;
+ if(a==='del')cards.splice(k,1);
+ if(a==='up'&&k>0)[cards[k-1],cards[k]]=[cards[k],cards[k-1]];
+ if(a==='down'&&k<cards.length-1)[cards[k+1],cards[k]]=[cards[k],cards[k+1]];
+ renderCards();
+});
+$('addcard').onclick=()=>{cards.push({id:uniqueId('kaart-'+(cards.length+1),-1),_auto:true,g:'m',p:'',tag:TAGS[0],name:'',role:'',claim:'',ctx:'',date:'',src:'',url:''});renderCards();const b=$('cards').lastElementChild;b.scrollIntoView({behavior:'smooth'});b.querySelector('input').focus()};
+const clean=()=>cards.map(c=>({id:String(c.id||'').trim(),g:c.g||'m',p:String(c.p||'').trim(),tag:c.tag||TAGS[0],name:String(c.name||'').trim(),role:String(c.role||'').trim(),claim:String(c.claim||'').trim(),ctx:String(c.ctx||'').trim(),date:String(c.date||'').trim(),src:String(c.src||'').trim(),url:String(c.url||'').trim()}));
+$('exp').onclick=()=>{$('jsonta').value=JSON.stringify(clean(),null,1);$('jsonbox').hidden=false;$('jsonapply').hidden=true;$('jsonta').select()};
+$('imp').onclick=()=>{$('jsonta').value='';$('jsonbox').hidden=false;$('jsonapply').hidden=false;$('jsonta').focus()};
+$('jsonclose').onclick=()=>{$('jsonbox').hidden=true};
+$('jsonapply').onclick=()=>{
+ try{let j=JSON.parse($('jsonta').value);if(j&&!Array.isArray(j)&&Array.isArray(j.cards)){if(!$('slabel').value&&j.label)$('slabel').value=j.label;j=j.cards}
+  if(!Array.isArray(j))throw 0;cards=j.map(c=>Object.assign({},c));$('jsonbox').hidden=true;renderCards();alertMsg(cards.length+' kaarti imporditud. Kontrolli üle ja salvesta.')}
+ catch(e){alertMsg('See ei ole korrektne JSON-loend.',true)}
+};
+function alertMsg(m,bad){const el=$('savemsg');el.textContent=m;el.className=bad?'err':'ok'}
+function validate(list){
+ const idre=/^[A-Za-z0-9_-]{1,40}$/,seen=new Set();
+ if(!idre.test($('sid').value.trim()))return 'Komplekti tunnuses võivad olla ainult tähed, numbrid, sidekriips ja alakriips.';
+ if(!$('slabel').value.trim())return 'Silt on puudu.';
+ if(!$('sopen').value||isNaN(new Date($('sopen').value)))return 'Avanemise aeg on puudu.';
+ if(!list.length)return 'Komplektis ei ole ühtegi kaarti.';
+ for(let k=0;k<list.length;k++){const c=list[k],w=(k+1)+'. kaart: ';
+  if(!idre.test(c.id))return w+'tunnuses võivad olla ainult tähed, numbrid, sidekriips ja alakriips.';
+  if(seen.has(c.id))return w+'tunnus "'+c.id+'" kordub.';seen.add(c.id);
+  if(!c.name)return w+'nimi on puudu.';if(!c.claim)return w+'väide on puudu.';
+  if(c.url&&!/^https:\/\//.test(c.url))return w+'link peab algama https://';
+  if(!c.url)return w+'allika link on puudu.';}
+ return '';
+}
+$('savebtn').onclick=async()=>{
+ const list=clean(),err=validate(list);if(err)return alertMsg(err,true);
+ $('savebtn').disabled=true;alertMsg('Salvestan…');
+ try{
+  const j=await api({action:'admin_save',set_id:$('sid').value.trim(),label:$('slabel').value.trim(),cards:list,published:$('spub').checked,opens_at:new Date($('sopen').value).toISOString()});
+  if(j.status==='saved'){isNew=false;$('sid').readOnly=true;alertMsg('Salvestatud'+($('spub').checked?' ja avaldatud.':' mustandina.'));loadSets()}
+  else if(j.status==='locked')alertMsg('Sellele komplektile on juba vastatud: kaartide loetelu ei saa muuta.',true);
+  else alertMsg(ERR[j.error]||'Salvestamine ei õnnestunud. Kontrolli välju.',true);
+ }catch(e){alertMsg(e.message,true)}
+ $('savebtn').disabled=false;
+};
+</script></body></html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="et"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Waib</title>
+<meta name="description" content="Nädala vaibid: 20 väidet Eesti inforuumist. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+/* Paigutus: üks kaart korraga; väide ajaleheseriifis, kõik muu süsteemifondis; teemal oma toon */
+:root{--bg:#f3f1ec;--card:#fffdf8;--ink:#1d1d1f;--mut:#6b6a66;--line:#dcd8cf;--pos:#2f7d5b;--neg:#b5523b;--neu:#8a8578;--acc:#2c4a7a;--shadow:0 10px 30px rgba(0,0,0,.12);--disp:"Newsreader",Georgia,"Times New Roman",serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#17181a;--card:#222326;--ink:#ecebe7;--mut:#a09e97;--line:#3a3b3f;--pos:#5fb38a;--neg:#e0826a;--neu:#9a968c;--acc:#8fb0e6;--shadow:0 10px 30px rgba(0,0,0,.5)}}
+:root[data-theme=dark]{--bg:#17181a;--card:#222326;--ink:#ecebe7;--mut:#a09e97;--line:#3a3b3f;--pos:#5fb38a;--neg:#e0826a;--neu:#9a968c;--acc:#8fb0e6;--shadow:0 10px 30px rgba(0,0,0,.5)}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#app{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:14px 16px 20px}
+header{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut);gap:8px}
+.seg{display:flex;align-items:flex-end;gap:3px;height:16px;flex:1;max-width:270px}
+.seg i{flex:1;border-radius:2px;background:var(--line);height:4px}
+.seg i.y{background:var(--pos);height:16px}.seg i.n{background:var(--neg);height:8px}.seg i.c{background:var(--acc)}
+.seg.big{height:40px;max-width:none;gap:4px;margin-top:12px}.seg.big i{border-radius:3px}.seg.big i.y{height:40px}.seg.big i.n{height:18px}
+.screen{flex:1;display:flex;flex-direction:column}
+.stage{position:relative;flex:1;min-height:500px;margin-top:12px}
+.card{position:absolute;inset:0;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;touch-action:none;user-select:none;cursor:grab;overflow:hidden}
+.card{border-top:6px solid var(--tc,var(--acc))}
+.card .tag{color:color-mix(in srgb,var(--tc,var(--acc)) 70%,var(--ink))}
+.card.back{transform:scale(.95) translateY(10px);opacity:.6;pointer-events:none}
+.card.fly{transition:transform .35s ease,opacity .35s}
+.tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);font-weight:600}
+.card h2{margin:8px 0 0;font-size:25px;line-height:1.15}
+.role{font-size:14px;color:var(--mut);margin-top:2px}
+.claim{margin:16px 0 0;font-family:var(--disp);font-size:22px;line-height:1.28;font-weight:500;padding-left:12px;border-left:3px solid var(--tc,var(--acc));text-wrap:pretty}
+.ctx{margin:14px 0 0;font-size:14.5px;color:var(--mut)}
+.foot{margin-top:auto;padding-top:12px;display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--mut);border-top:1px solid var(--line)}
+.foot a{color:var(--acc);text-decoration:none;font-weight:600}
+.stamp{position:absolute;top:18px;padding:4px 10px;border-radius:8px;border:2px solid;font-weight:800;font-size:15px;letter-spacing:.05em;opacity:0;background:var(--card)}
+.stamp.y{right:16px;color:var(--pos);transform:rotate(8deg)}.stamp.n{left:16px;color:var(--neg);transform:rotate(-8deg)}
+.btns{display:flex;gap:10px;margin-top:14px}
+button{font:inherit;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px 14px;cursor:pointer;flex:1}
+button:hover{border-color:var(--acc)}
+button.pri{background:var(--acc);color:var(--bg);border-color:var(--acc);font-weight:600}
+button.no{color:var(--neg);font-weight:700}button.yes{color:var(--pos);font-weight:700}
+.btns.top{margin-top:12px}.btns.top button{font-size:19px;padding:12px 10px;border-width:2px;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:16px}
+.btns.top button.no:hover,.btns.top button.no:active{border-color:var(--neg)}.btns.top button.yes:hover,.btns.top button.yes:active{border-color:var(--pos)}
+.em{font-size:34px;line-height:1.1}
+.intro h1,.sum h2{font-family:var(--disp);font-weight:600;text-wrap:balance}
+.intro h1{font-size:34px;margin:28px 0 10px;line-height:1.1}.intro p{font-size:17px;color:var(--mut);margin:0 0 12px}
+.small{font-size:13px;color:var(--mut)}
+.sum h2{font-size:30px;margin:20px 0 6px}
+.sum h3{font-size:16px;margin:22px 0 6px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px}
+.big{display:flex;gap:10px}.big div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.big b{display:block;font-size:30px;line-height:1.1}.big .y b{color:var(--pos)}.big .n b{color:var(--neg)}
+.split{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line);margin-top:10px;gap:2px}
+.split i{display:block}.split .y{background:var(--pos)}.split .n{background:var(--neg)}
+.bar{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.bar:first-child{border-top:0}
+.bar .split{grid-column:1/3;height:8px;margin-top:2px}
+.scale{position:relative;height:46px;margin:14px 6px 4px}
+.scale .ax{position:absolute;left:0;right:0;top:22px;height:2px;background:var(--line)}
+.scale .o{position:absolute;top:17px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--neu);opacity:.45}
+.scale .me{position:absolute;top:11px;width:24px;height:24px;margin-left:-12px;border-radius:50%;background:var(--acc);border:3px solid var(--card);box-shadow:0 0 0 1px var(--acc)}
+.scale .lb{position:absolute;top:-8px;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--acc);white-space:nowrap}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+.dec{font-size:14px;margin:4px 0;padding:0;list-style:none}
+.dec li{display:grid;grid-template-columns:22px 1fr;gap:2px 8px;padding:9px 0;border-top:1px solid var(--line)}
+.dec li:first-child{border-top:0}
+.dec .s{width:20px;height:20px;display:grid;place-items:center;font-size:15px;margin-top:1px}
+.dec span.q{grid-column:2;color:var(--mut)}
+.dec .ot{grid-column:2;font-size:12.5px;color:var(--mut)}
+.dec a{color:var(--acc);text-decoration:none}
+.mini{display:inline-block;vertical-align:middle;width:70px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-right:6px}.mini i{display:block;height:100%;background:var(--pos)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
+@media (prefers-reduced-motion:reduce){.card.fly,.res,.rx li{transition:none;animation:none}}
+kbd{font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.hist{display:flex;align-items:flex-end;gap:3px;height:70px;margin:4px 0 4px}
+.hist i{flex:1;background:var(--neu);opacity:.45;border-radius:2px 2px 0 0;min-height:3px}
+.hist i.me{background:var(--acc);opacity:1}
+a{color:var(--acc)}
+</style></head><body><div id="app"></div>
+<script src="config.js"></script>
+<script>
+const CFG=window.WAIB||{},API=String(CFG.API||'').trim(),GCID=String(CFG.GOOGLE_CLIENT_ID||'').trim(),DEMO=!API;
+const app=document.getElementById('app');
+let SET=null,C=[],ans={},i=0,busy=false,sent=false;
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const TC={"Sotsiaalpoliitika":"#c2578f","Riigijuhtimine":"#64748b","Majandus":"#c79a1e","IT":"#16a3b8","Energeetika":"#e0762a","Haridus":"#3d8fd6","Kultuur":"#9b59b6","Riigikaitse":"#7c7a3c","Välispoliitika":"#4b5fc4"};
+const tc=t=>TC[t]||'var(--acc)';
+const GN={v:"Valitsus",o:"Opositsioon",m:"Parteitud, eksperdid ja teised"};
+const store={
+ get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
+ set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+ del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const key=()=>'waib:'+SET.id;
+const save=()=>store.set(key(),{ans,sent});
+const done=()=>C.length>0&&C.every(c=>c.id in ans);
+const safeUrl=u=>/^https:\/\//.test(String(u||''))?u:'';
+async function api(body){
+ const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ let j=null;try{j=await r.json()}catch(e){}
+ if(!j)throw new Error('http '+r.status);
+ return j;
+}
+function msg(title,text,btn){
+ app.innerHTML=`<div class="screen intro"><h1>Waib</h1><p><b style="color:var(--ink)">${esc(title)}</b></p><p>${esc(text)}</p>${btn?`<div style="margin-top:auto"><button class="pri" style="width:100%" id="mb">${esc(btn)}</button></div>`:''}</div>`;
+ if(btn)$('mb').onclick=()=>location.reload();
+}
+function seg(cur,big){return `<div class="seg${big?' big':''}" aria-hidden="true">${C.map((c,k)=>`<i class="${c.id in ans?(ans[c.id]?'y':'n'):k===cur?'c':''}"></i>`).join('')}</div>`}
+
+async function boot(){
+ const frag=new URLSearchParams(location.hash.replace(/^#/,''));
+ const idt=frag.get('id_token'),st=frag.get('state'),oerr=frag.get('error');
+ if(idt||st||oerr)history.replaceState(null,'',location.pathname+location.search);
+ msg('Laen…','');
+ try{
+  if(DEMO){const r=await fetch('kaardid-naidis.json',{cache:'no-store'});SET=await r.json()}
+  else{const j=await api({action:'set'});if(j.error)throw new Error(j.error);SET=j.set}
+ }catch(e){return msg('Kaarte ei õnnestunud laadida.','Kontrolli internetiühendust ja proovi uuesti.','Proovi uuesti')}
+ C=SET&&Array.isArray(SET.cards)?SET.cards.filter(c=>c&&c.id&&c.name&&c.claim):[];
+ if(!C.length)return msg('Selle nädala vaibid ei ole veel üleval.','Uus komplekt ilmub reedel.');
+ const s=store.get(key());
+ if(s&&s.ans){C.forEach(c=>{if(s.ans[c.id]===0||s.ans[c.id]===1)ans[c.id]=s.ans[c.id]});sent=!!s.sent}
+ if(idt&&done())return summary({token:idt,state:st});
+ if(oerr&&done())return summary({error:'Sisselogimine katkes. Proovi uuesti.'});
+ intro();
+}
+function intro(){
+ const k=C.filter(c=>c.id in ans).length;
+ app.innerHTML=`<div class="screen intro"><span class="tag" style="margin-top:20px">${esc(SET.label||'')}</span><h1 style="margin-top:6px">Waib</h1>
+ ${DEMO?'<p class="small" style="border:1px dashed var(--line);border-radius:10px;padding:8px 10px">Näidisrežiim: server ei ole veel ühendatud. Kaardid on näidised ja võrdlust teistega ei ole.</p>':''}
+ <p><b style="color:var(--ink)">Nädala vaibid.</b> ${C.length} väidet, mida poliitikud ja avaliku elu tegelased on Eesti inforuumis esitanud.</p>
+ <p>Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi. Ära mõtle kaua: loeb esimene tunne.</p>
+ <p>Lõpus näed, mitu väidet sulle vaibis ja kuhu sa teiste vastajate seas asetud.</p>
+ <div class="box" style="margin:6px 0 16px;border-color:var(--acc)"><b style="font-size:17px">Me ei tea, kes sa oled.</b>
+ <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Sinu nime ega e-posti aadressi me ei näe. Sinu vastuseid me ei salvesta: liidame need üldarvudele ja unustame kohe. Sisselogimist on vaja ainult selleks, et igaüks saaks vastata ühe korra nädalas.</p></div>
+ <div style="margin-top:auto"><button class="pri" style="width:100%" id="go">${done()?'Vaata oma tulemust':k?`Jätka (${k}/${C.length})`:'Alusta'}</button>
+ <p class="small" style="text-align:center;margin-top:10px">Klaviatuuril <kbd>←</kbd> 👎 ei vaibi, <kbd>→</kbd> ❤️ vaibib</p>
+ <p class="small" style="text-align:center">Väited on allikate põhjal lihtsas keeles ümber sõnastatud, mitte sõnasõnalised tsitaadid. <a href="privaatsus.html" style="color:var(--acc)">Privaatsus</a></p></div></div>`;
+ $('go').onclick=()=>done()?summary({}):card();
+}
+function cardHTML(c,front){
+ const u=safeUrl(c.url);
+ return `<span class="tag">${esc(c.tag||'')}</span><h2>${esc(c.name)}</h2><div class="role">${esc(c.role||'')}</div>
+ ${front?`<p class="claim">${esc(c.claim)}</p><p class="ctx">${esc(c.ctx||'')}</p>
+ <div class="foot"><span>${esc(c.date||'')}</span>${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(c.src||'Allikas')} ↗</a>`:`<span>${esc(c.src||'')}</span>`}</div>
+ <span class="stamp y" id="sy">❤️ VAIBIB</span><span class="stamp n" id="sn">👎 EI VAIBI</span>`:''}`;
+}
+function card(){
+ i=C.findIndex(c=>!(c.id in ans));if(i<0)return summary({});
+ const c=C[i],nx=C.slice(i+1).find(x=>!(x.id in ans));busy=false;
+ app.innerHTML=`<header><span>${i+1} / ${C.length}</span>${seg(i)}</header>
+ <div class="screen"><div class="btns top"><button class="no" id="bl"><span class="em">👎</span>Ei vaibi</button><button class="yes" id="br"><span class="em">❤️</span>Vaibib</button></div>
+ <div class="stage">${nx?`<div class="card back" style="--tc:${tc(nx.tag)}">${cardHTML(nx,false)}</div>`:''}
+ <div class="card" id="cd" style="--tc:${tc(c.tag)}">${cardHTML(c,true)}</div></div></div>`;
+ const cd=$('cd'),sy=$('sy'),sn=$('sn');
+ let x0=null,dx=0;
+ const set=()=>{cd.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`;sy.style.opacity=Math.max(0,Math.min(1,dx/80));sn.style.opacity=Math.max(0,Math.min(1,-dx/80))};
+ cd.onpointerdown=e=>{if(e.target.closest('a'))return;x0=e.clientX;cd.setPointerCapture(e.pointerId);cd.style.transition='none';cd.style.cursor='grabbing'};
+ cd.onpointermove=e=>{if(x0==null)return;dx=e.clientX-x0;set()};
+ const up=()=>{if(x0==null)return;x0=null;cd.style.cursor='';const w=cd.offsetWidth;if(Math.abs(dx)>w*.28)pick(dx>0?1:0);else{cd.style.transition='transform .2s';dx=0;set()}};
+ cd.onpointerup=up;cd.onpointercancel=up;
+ $('bl').onclick=()=>pick(0);$('br').onclick=()=>pick(1);
+}
+function pick(v){
+ if(busy)return;busy=true;
+ const c=C[i],cd=$('cd');
+ $(v?'sy':'sn').style.opacity=1;
+ cd.classList.add('fly');cd.style.transform=`translateX(${v?130:-130}%) rotate(${v?18:-18}deg)`;cd.style.opacity=0;
+ ans[c.id]=v;save();
+ setTimeout(()=>done()?summary({}):card(),280);
+}
+function split(y,n,tot){return `<div class="split"><i class="y" style="width:${y/tot*100}%"></i><i class="n" style="width:${n/tot*100}%"></i></div>`}
+function summary(mode){
+ const L=C.filter(c=>ans[c.id]===1).length,N=C.length-L;
+ const topics={},gr={},pa={};
+ C.forEach(c=>{const y=ans[c.id]===1;
+  const t=topics[c.tag||'Muu']=topics[c.tag||'Muu']||{y:0,n:0};y?t.y++:t.n++;
+  const g=GN[c.g]?c.g:'m',q=gr[g]=gr[g]||{y:0,n:0};y?q.y++:q.n++;
+  if(c.p){const w=pa[c.p]=pa[c.p]||{y:0,n:0};y?w.y++:w.n++}});
+ const mx=o=>Math.max(1,...Object.values(o).map(t=>t.y+t.n));
+ const rt=t=>t&&t.y+t.n?t.y/(t.y+t.n):null,rv=rt(gr.v),ro=rt(gr.o);
+ const note=rv==null||ro==null?'':Math.abs(rv-ro)>=.4?`${rv>ro?'Valitsuse':'Opositsiooni'} inimeste väited vaibisid sulle selgelt sagedamini kui ${rv>ro?'opositsiooni':'valitsuse'} omad.`:'Valitsuse ja opositsiooni väited vaibisid sulle umbes sama sageli.';
+ const rows=(o,m,nm,dot)=>Object.entries(o).map(([t,v])=>`<div class="bar"><span>${dot?`<i class="dot" style="background:${tc(t)}"></i>`:''}${esc(nm?nm[t]:t)}</span><span class="small">❤️ ${v.y} · 👎 ${v.n}</span>${split(v.y,v.n,m)}</div>`).join('');
+ const grOrdered={};['v','o','m'].forEach(k=>{if(gr[k])grOrdered[k]=gr[k]});
+ app.innerHTML=`<div class="screen sum"><span class="tag" style="margin-top:16px">${esc(SET.label||'')}</span><h2 style="margin-top:4px">Sinu nädal</h2>
+ <div class="big"><div class="n"><b>👎 ${N}</b>ei vaibinud</div><div class="y"><b>❤️ ${L}</b>vaibis</div></div>
+ ${seg(-1,true)}
+ <p class="small" style="margin:6px 0 0">Sinu ${C.length} valikut järjest: kõrge tulp vaibis, madal ei vaibinud.</p>
+ <h3>Kuhu sa teiste seas asetud</h3>
+ <div class="box" id="cmp"></div>
+ <h3>Kelle väited sulle vaibisid</h3>
+ <div class="box">${note?`<p style="margin:0 0 8px;font-size:15px">${esc(note)}</p>`:''}${rows(grOrdered,mx(gr),GN)}</div>
+ ${Object.keys(pa).length?`<div class="box">${rows(pa,mx(pa))}</div>`:''}
+ <h3>Teemade kaupa</h3>
+ <div class="box">${rows(topics,mx(topics),null,true)}</div>
+ <h3>Kõik väited</h3>
+ <div class="box"><ul class="dec">${C.map(c=>{const u=safeUrl(c.url);return `<li><span class="s">${ans[c.id]?'❤️':'👎'}</span><span><b>${esc(c.name)}</b>${u?` · <a href="${esc(u)}" target="_blank" rel="noopener">${esc(c.src||'Allikas')} ↗</a>`:''}</span><span class="q">${esc(c.claim)}</span><span class="ot" data-ot="${esc(c.id)}"></span></li>`}).join('')}</ul></div>
+ <p class="small" style="margin-top:14px">Väited on allikate põhjal lihtsas keeles ümber sõnastatud. Vaib on sinu esimene reaktsioon: väitele, inimesele või mõlemale korraga. See ei ütle, kas väide on tõene. <a href="privaatsus.html" style="color:var(--acc)">Privaatsus</a></p>
+ ${DEMO?'<div class="btns"><button class="pri" id="again">Alusta uuesti</button></div>':''}</div>`;
+ if(DEMO)$('again').onclick=()=>{ans={};sent=false;store.del(key());card()};
+ scrollTo(0,0);
+ compare(mode||{},L);
+}
+const rand=()=>Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('');
+function jwtPayload(t){try{const p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(atob(p+'='.repeat((4-p.length%4)%4)))}catch(e){return null}}
+function login(){
+ const nonce=rand(),state=rand();
+ store.set('waib:login',{nonce,state,set:SET.id});save();
+ const q=new URLSearchParams({client_id:GCID,response_type:'id_token',scope:'openid',redirect_uri:location.origin+location.pathname,nonce,state,prompt:'select_account'});
+ location.href='https://accounts.google.com/o/oauth2/v2/auth?'+q.toString();
+}
+function loginBox(box,err){
+ box.innerHTML=`${err?`<p style="margin:0 0 10px;color:var(--neg);font-weight:600">${esc(err)}</p>`:''}
+ <p style="margin:0;font-size:15px">Võrdluse nägemiseks liidame sinu ${C.length} vastust anonüümselt üldarvudele. Google'i sisselogimist on vaja ainult selleks, et igaüks saaks vastata ühe korra nädalas. Sinu nime ega e-posti aadressi me ei küsi ega näe.</p>
+ <div class="btns"><button class="pri" id="lg">Logi sisse Google'iga ja vaata võrdlust</button></div>
+ <p class="small" style="margin:8px 0 0">Nupule vajutades nõustud, et sinu vastused liidetakse üldarvudele. Pärast seda ei saa vastuseid enam muuta. <a href="privaatsus.html" style="color:var(--acc)">Loe täpsemalt</a></p>`;
+ $('lg').onclick=login;
+}
+async function compare(mode,L){
+ const box=$('cmp');
+ const say=m=>{box.innerHTML=`<span class="small">${esc(m)}</span>`};
+ if(DEMO)return say('Näidisrežiimis võrdlust ei ole. See tekib siis, kui server on ühendatud.');
+ if(!GCID)return say('Sisselogimine ei ole veel seadistatud.');
+ try{
+  if(mode.token){
+   const p=store.get('waib:login');store.del('waib:login');
+   const pay=jwtPayload(mode.token);
+   if(!p||!pay||p.state!==mode.state||pay.nonce!==p.nonce||p.set!==SET.id)return loginBox(box,'Sisselogimine ei õnnestunud. Proovi uuesti.');
+   say('Saadan vastuseid…');
+   const j=await api({action:'submit',set_id:SET.id,id_token:mode.token,answers:ans});
+   if(j.status==='ok'||j.status==='already'){sent=true;save();return draw(box,j.stats,L,j.status==='already')}
+   if(j.status==='closed')return say('See komplekt on juba suletud ja uus on üleval. Laadi leht uuesti.');
+   return loginBox(box,j.error==='bad_token'?'Sisselogimine aegus. Proovi uuesti.':'Vastuste saatmine ei õnnestunud. Proovi uuesti.');
+  }
+  if(!sent)return loginBox(box,mode.error);
+  say('Laen teiste vastuseid…');
+  const j=await api({action:'stats',set_id:SET.id});
+  if(!j.stats)throw new Error('stats');
+  draw(box,j.stats,L,false);
+ }catch(e){
+  if(mode.token||!sent)loginBox(box,'Ühendus serveriga ei õnnestunud. Proovi uuesti.');
+  else say('Teiste vastuseid ei õnnestunud praegu laadida. Sinu enda tulemus on allpool näha.');
+ }
+}
+function draw(box,st,L,already){
+ const extra=already?' Selle Google\'i kontoga on sel nädalal juba vastatud; arvesse läks esimene vastus.':'';
+ if(!st||!st.cards||!Array.isArray(st.dist)){
+  box.innerHTML=`<b>Sinu vastused on arvesse võetud.</b><br><span class="small">Vastajaid on praegu ${esc(st&&st.n!=null?st.n:0)}. Võrdlus avaneb, kui neid on vähemalt ${esc(st&&st.min||10)}: nii ei saa koondarvudest kellegi üksikuid vastuseid välja lugeda. Tule hiljem tagasi.${esc(extra)}</span>`;
+  return;
+ }
+ const n=st.n,d=st.dist,dmax=Math.max(1,...d);
+ let tot=0,below=0;d.forEach((x,k)=>{tot+=k*x;if(k<L)below+=x});
+ const avg=tot/n;
+ let ag=0,agN=0,maj=0,clear=0;const pct={};
+ C.forEach(c=>{const t=st.cards[c.id];if(!t)return;const y=+t[0]||0,m=y+(+t[1]||0);if(!m)return;
+  const p=y/m;pct[c.id]=p;ag+=ans[c.id]?p:1-p;agN++;
+  if(y*2!==m){clear++;if((y*2>m?1:0)===ans[c.id])maj++}});
+ box.innerHTML=`<div class="hist" aria-hidden="true">${d.map((x,k)=>`<i class="${k===L?'me':''}" style="height:${Math.max(4,x/dmax*100)}%"></i>`).join('')}</div>
+ <div class="ends"><span>ei vaibi miski</span><span>vaibib kõik</span></div>
+ <p class="small" style="margin:6px 0 0">Tulbad näitavad, mitu vastajat sai iga tulemuse. Värviline tulp on sinu oma.</p>
+ <p style="margin:12px 0 0;font-size:15px">Sulle vaibis <b>${L}</b> väidet ${C.length}-st; vastajatele keskmiselt <b>${avg.toFixed(1).replace('.',',')}</b>. Sulle vaibis rohkem väiteid kui <b>${Math.round(below/n*100)}%</b> vastajatest.</p>
+ ${agN?`<p style="margin:8px 0 0;font-size:15px">Juhusliku vastajaga langeb sinu valik kokku keskmiselt <b>${Math.round(ag/agN*100)}%</b> väidete puhul${clear?`; enamusega olid samal poolel <b>${maj}</b> väite puhul ${clear}-st`:''}.</p>`:''}
+ <p class="small" style="margin:8px 0 0">Võrdluses on ${n} vastajat, sina kaasa arvatud.${esc(extra)}</p>`;
+ document.querySelectorAll('[data-ot]').forEach(el=>{const p=pct[el.dataset.ot];if(p==null)return;el.innerHTML=`<span class="mini"><i style="width:${p*100}%"></i></span>vastajatest vaibis ${Math.round(p*100)}%`});
+}
+addEventListener('keydown',e=>{
+ if($('cd')&&!busy){if(e.key=='ArrowLeft')pick(0);if(e.key=='ArrowRight')pick(1)}
+});
+boot();
+</script></body></html>
