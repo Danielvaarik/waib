@@ -238,7 +238,7 @@ async function compare(mode,L){
    const j=await api({action:'submit',set_id:SET.id,id_token:mode.token,answers:ans});
    if(j.status==='ok'||j.status==='already'){sent=true;save();return draw(box,j.stats,L,j.status==='already')}
    if(j.status==='closed')return say('See komplekt on juba suletud ja uus on üleval. Laadi leht uuesti.');
-   return loginBox(box,j.error==='bad_token'?'Sisselogimine aegus. Proovi uuesti.':'Vastuste saatmine ei õnnestunud. Proovi uuesti.');
+   return loginBox(box,j.error==='bad_token'?'Sisselogimine aegus. Proovi uuesti.':'Vastuste saatmine ei õnnestunud. Proovi uuesti. (Veakood: '+String(j.error||j.status||'tundmatu').slice(0,40)+')');
   }
   if(!sent)return loginBox(box,mode.error);
   say('Laen teiste vastuseid…');
