@@ -82,6 +82,8 @@ kbd{font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:
 .vsbar{height:14px;border-radius:7px;margin-top:8px}
 .timer{height:3px;border-radius:2px;background:var(--line);overflow:hidden}.timer i{display:block;height:100%;width:0;background:var(--acc)}
 button:disabled{opacity:.5;cursor:default}
+.status{margin:0 0 10px;font-size:14px;color:var(--mut);text-align:center}.status .ok{color:var(--pos)}.status .off{color:var(--neu)}
+button.lnk{flex:none;display:inline;width:auto;padding:0;border:0;background:none;color:var(--acc);text-decoration:underline;font-size:inherit;border-radius:2px}
 .hist{display:flex;align-items:flex-end;gap:3px;height:70px;margin:4px 0 4px}
 .hist i{flex:1;background:var(--neu);opacity:.45;border-radius:2px 2px 0 0;min-height:3px}
 .hist i.me{background:var(--acc);opacity:1}
@@ -173,26 +175,36 @@ async function sync(){
 }
 function intro(err){
  phase='';
- const k=C.filter(c=>c.id in ans).length,need=!DEMO&&!sess&&!guest,canLogin=!DEMO&&!sess&&!!GCID;
+ const k=C.filter(c=>c.id in ans).length,need=!DEMO&&!sess&&!guest,canLogin=!DEMO&&!sess&&!!GCID,fd=done();
+ // Olekurida: kas inimene on sisse logitud või vastab sisse logimata
+ const status=DEMO?'':sess?'<p class="status"><span class="ok">●</span> Oled Google\'iga sisse logitud. <button class="lnk" id="out">Logi välja</button></p>'
+  :guest?`<p class="status"><span class="off">●</span> ${Object.keys(res).length?'Oled välja logitud. Seni antud vastused on arvesse võetud.':'Vastad sisse logimata: sinu vastused on ainult selles seadmes.'}</p>`:'';
+ const lead=fd?`<div class="box" style="margin:6px 0 14px"><b style="font-size:17px">Selle nädala vaibid on sul läbi käidud.</b>
+ <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Uus komplekt ilmub reedel. Seni saad vaadata oma kokkuvõtet${sess?' ja seda, kuidas koondtulemus muutub':''}.</p></div>`
+ :k?`<div class="box" style="margin:6px 0 14px"><b style="font-size:17px">Sul on pooleli: ${k} väidet ${C.length}-st.</b>
+ <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Jätka sealt, kus pooleli jäid. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.</p></div>`
+ :`<p>Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi. Ära mõtle kaua: loeb esimene tunne.</p>`;
  app.innerHTML=`<div class="screen intro"><span class="tag" style="margin-top:20px">${esc(SET.label||'')}</span><h1 style="margin-top:6px">Waib</h1>
  ${DEMO?'<p class="small" style="border:1px dashed var(--line);border-radius:10px;padding:8px 10px">Näidisrežiim: server ei ole veel ühendatud. Kaardid on näidised ja koondtulemust ei ole.</p>':''}
  <p><b style="color:var(--ink)">Nädala vaibid.</b> ${C.length} väidet, mida poliitikud ja avaliku elu tegelased on Eesti inforuumis esitanud.</p>
- <p>Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi. Ära mõtle kaua: loeb esimene tunne.</p>
- <div class="box" style="margin:6px 0 14px;border-color:var(--acc)"><b style="font-size:17px">Me ei tea, kes sa oled.</b>
- <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Sinu nime ega e-posti aadressi me ei näe. Sinu vastuseid me ei salvesta: liidame need üldarvudele ja unustame kohe. Sisselogimist on vaja ainult selleks, et igaüks saaks vastata ühe korra nädalas.</p></div>
+ ${lead}
+ ${need||(!k&&!fd)?`<div class="box" style="margin:6px 0 14px;border-color:var(--acc)"><b style="font-size:17px">Me ei tea, kes sa oled.</b>
+ <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Sinu nime ega e-posti aadressi me ei näe. Sinu vastuseid me ei salvesta: liidame need üldarvudele ja unustame kohe. Sisselogimist on vaja ainult selleks, et igaüks saaks vastata ühe korra nädalas.</p></div>`:''}
  ${err?`<p style="color:var(--neg);font-weight:600;margin:0 0 10px" role="alert">${esc(err)}</p>`:''}
  <div style="margin-top:auto">
- ${need?`${GCID?`<button class="pri" style="width:100%" id="lgn">Logi sisse Google'iga ja alusta</button>
+ ${need?`${GCID?`<button class="pri" style="width:100%" id="lgn">Logi sisse Google'iga ja ${k?'jätka':'alusta'}</button>
  <p class="small" style="text-align:center;margin:8px 0 12px">Sisse logides näed iga väite järel koondtulemust: mitmele protsendile vastajatest see vaibis. Nupule vajutades nõustud, et sinu vastused liidetakse anonüümselt üldarvudele; antud vastust ei saa hiljem muuta. <a href="privaatsus.html">Loe täpsemalt</a></p>`:''}
  <button style="width:100%" id="gst">Jätka sisse logimata</button>
  <p class="small" style="text-align:center;margin-top:8px">Sisse logimata koondtulemust ei näe ja sinu vastused jäävad ainult sinu seadmesse.</p>`
- :`<button class="pri" style="width:100%" id="go">${done()?'Vaata oma tulemust':k?`Jätka (${k}/${C.length})`:'Alusta'}</button>
+ :`${status}<button class="pri" style="width:100%" id="go">${fd?'Vaata oma tulemust':k?`Jätka (${k}/${C.length})`:'Alusta'}</button>
  ${guest&&canLogin?`<button style="width:100%;margin-top:8px" id="lgn">Logi sisse ja vaata koondtulemust</button>`:''}`}
- <p class="small" style="text-align:center;margin-top:10px">Klaviatuuril <kbd>←</kbd> 👎 ei vaibi, <kbd>→</kbd> ❤️ vaibib</p>
- <p class="small" style="text-align:center">Väited on allikate põhjal lihtsas keeles ümber sõnastatud, mitte sõnasõnalised tsitaadid.${need?'':' <a href="privaatsus.html">Privaatsus</a>'}</p></div></div>`;
+ ${fd?'':'<p class="small" style="text-align:center;margin-top:10px">Klaviatuuril <kbd>←</kbd> 👎 ei vaibi, <kbd>→</kbd> ❤️ vaibib</p>'}
+ <p class="small" style="text-align:center${fd?';margin-top:10px':''}">Väited on allikate põhjal lihtsas keeles ümber sõnastatud, mitte sõnasõnalised tsitaadid.${need?'':' <a href="privaatsus.html">Privaatsus</a>'}</p></div></div>`;
  if($('go'))$('go').onclick=()=>done()?summary():card();
  if($('lgn'))$('lgn').onclick=login;
  if($('gst'))$('gst').onclick=()=>{guest=true;save();card()};
+ // Väljalogimine kustutab selle seadme seansi; juba antud vastused jäävad alles ja arvesse.
+ if($('out'))$('out').onclick=()=>{sess='';store.del(skey());guest=true;save();intro()};
 }
 function headHTML(c){
  const im=safeImg(c.img);
