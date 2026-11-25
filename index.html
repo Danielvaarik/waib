@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#FFD60A">
 <meta name="apple-mobile-web-app-title" content="Waib">
 <meta name="description" content="Nädala vaibid: 20 väidet Eesti inforuumist. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Playfair+Display:wght@800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <style>
 /* Paigutus: üks kaart korraga; väide ajaleheseriifis, kõik muu süsteemifondis; teemal oma toon */
 :root{--bg:#f5f3ec;--card:#ffffff;--ink:#111111;--mut:#66645e;--line:#ddd9ce;--pos:#237a52;--neg:#b5462f;--neu:#8a8578;--acc:#111111;--brand:#FFD60A;--onbrand:#111111;--shadow:0 10px 30px rgba(0,0,0,.12);--disp:"Newsreader",Georgia,"Times New Roman",serif}
@@ -53,8 +53,10 @@ button.no{color:var(--neg);font-weight:700}button.yes{color:var(--pos);font-weig
 .btns.top button.no:hover,.btns.top button.no:active{border-color:var(--neg)}.btns.top button.yes:hover,.btns.top button.yes:active{border-color:var(--pos)}
 .em{font-size:34px;line-height:1.1}
 .intro h1,.sum h2{font-family:var(--disp);font-weight:600;text-wrap:balance}
-.intro h1.logo{display:flex;align-items:center;gap:12px;margin:8px 0 14px;padding:16px 18px;border-radius:18px;background:#FFD60A;color:#111;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:58px;line-height:1;letter-spacing:-.03em}
-.intro h1.logo svg{width:60px;height:60px;flex:none}
+.intro h1.logo{display:flex;flex-direction:column;align-items:flex-start;margin:8px 0 16px;padding:20px 22px 26px;border-radius:18px;background:#111;border:1px solid var(--line);overflow:hidden}
+.intro h1.logo .news{position:relative;font-family:"Playfair Display",Georgia,serif;font-weight:800;font-size:40px;line-height:1;letter-spacing:.04em;color:#fff;opacity:.85}
+.intro h1.logo .news::after{content:"";position:absolute;left:-6px;right:-6px;top:46%;height:5px;background:#FFD60A;transform:rotate(-3deg)}
+.intro h1.logo .tape{margin-top:20px;padding:4px 18px 10px;background:#FFD60A;color:#111;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:68px;line-height:1;letter-spacing:-.03em;transform:rotate(-5deg);transform-origin:left center}
 .intro h1{font-size:34px;margin:28px 0 10px;line-height:1.1}.intro p{font-size:17px;color:var(--mut);margin:0 0 12px}
 .small{font-size:13px;color:var(--mut)}
 .sum h2{font-size:30px;margin:20px 0 6px}
@@ -194,7 +196,7 @@ function intro(err){
  :k?`<div class="box" style="margin:6px 0 14px"><b style="font-size:17px">Sul on pooleli: ${k} väidet ${C.length}-st.</b>
  <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Jätka sealt, kus pooleli jäid. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.</p></div>`
  :`<p>Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi. Ära mõtle kaua: loeb esimene tunne.</p>`;
- app.innerHTML=`<div class="screen intro"><span class="tag" style="margin-top:20px">${esc(SET.label||'')}</span><h1 class="logo" aria-label="Waib"><svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-8 50 50)"><circle cx="50" cy="50" r="50" fill="#111111"></circle><path d="M18 30 L34 72 L50 40 L66 72 L82 30" transform="translate(12 12) scale(0.76)" fill="none" stroke="#FFD60A" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"></path></g></svg><span aria-hidden="true">waib</span></h1>
+ app.innerHTML=`<div class="screen intro"><span class="tag" style="margin-top:20px">${esc(SET.label||'')}</span><h1 class="logo" aria-label="Waib"><span class="news" aria-hidden="true">UUDISED</span><span class="tape" aria-hidden="true">waib</span></h1>
  ${DEMO?'<p class="small" style="border:1px dashed var(--line);border-radius:10px;padding:8px 10px">Näidisrežiim: server ei ole veel ühendatud. Kaardid on näidised ja koondtulemust ei ole.</p>':''}
  <p><b style="color:var(--ink)">Nädala vaibid.</b> ${C.length} väidet, mida poliitikud ja avaliku elu tegelased on Eesti inforuumis esitanud.</p>
  ${lead}
