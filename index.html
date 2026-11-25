@@ -25,6 +25,10 @@ header{display:flex;justify-content:space-between;align-items:center;font-size:1
 .card.fly{transition:transform .35s ease,opacity .35s}
 .tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);font-weight:600}
 .card h2{margin:8px 0 0;font-size:25px;line-height:1.15}
+.who{display:flex;gap:14px;align-items:center}.who>div{min-width:0}
+.ph{flex:none;width:84px;height:84px;border-radius:50%;object-fit:cover;background:var(--line);border:3px solid var(--tc,var(--acc));-webkit-user-drag:none;pointer-events:none}
+.who h2{margin-top:4px;font-size:23px}
+.cred{margin:8px 0 0;font-size:11px;color:var(--mut)}
 .role{font-size:14px;color:var(--mut);margin-top:2px}
 .claim{margin:16px 0 0;font-family:var(--disp);font-size:22px;line-height:1.28;font-weight:500;padding-left:12px;border-left:3px solid var(--tc,var(--acc));text-wrap:pretty}
 .ctx{margin:14px 0 0;font-size:14.5px;color:var(--mut)}
@@ -94,6 +98,8 @@ const key=()=>'waib:'+SET.id;
 const save=()=>store.set(key(),{ans,sent});
 const done=()=>C.length>0&&C.every(c=>c.id in ans);
 const safeUrl=u=>/^https:\/\//.test(String(u||''))?u:'';
+// Pilt: toimetajavaates vähendatud JPEG (data-URL), https-aadress või fail kaustast pildid/
+const safeImg=u=>{u=String(u||'');return /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u)||/^https:\/\/[^\s"'<>]+$/.test(u)||/^pildid\/[A-Za-z0-9._-]+$/.test(u)?u:''};
 async function api(body){
  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
  let j=null;try{j=await r.json()}catch(e){}
@@ -139,8 +145,11 @@ function intro(){
 }
 function cardHTML(c,front){
  const u=safeUrl(c.url);
- return `<span class="tag">${esc(c.tag||'')}</span><h2>${esc(c.name)}</h2><div class="role">${esc(c.role||'')}</div>
+ const im=safeImg(c.img);
+ const head=`<span class="tag">${esc(c.tag||'')}</span><h2>${esc(c.name)}</h2><div class="role">${esc(c.role||'')}</div>`;
+ return `${im?`<div class="who"><img class="ph" src="${esc(im)}" alt="" draggable="false"><div>${head}</div></div>`:head}
  ${front?`<p class="claim">${esc(c.claim)}</p><p class="ctx">${esc(c.ctx||'')}</p>
+ ${im&&c.imgc?`<p class="cred">Foto: ${esc(c.imgc)}</p>`:''}
  <div class="foot"><span>${esc(c.date||'')}</span>${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(c.src||'Allikas')} ↗</a>`:`<span>${esc(c.src||'')}</span>`}</div>
  <span class="stamp y" id="sy">❤️ VAIBIB</span><span class="stamp n" id="sn">👎 EI VAIBI</span>`:''}`;
 }

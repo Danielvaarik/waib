@@ -25,6 +25,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 .err{color:var(--neg);font-weight:600}.ok{color:var(--pos);font-weight:600}
 .cnt{float:right;font-weight:400}.cnt.long{color:var(--neg)}
 .chk{display:flex;align-items:center;gap:8px;margin-top:10px}.chk input{width:auto}
+.phrow{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:6px}.phrow>div{flex:1;min-width:180px}
+.phprev{width:72px;height:72px;border-radius:50%;object-fit:cover;background:var(--line);border:1px solid var(--line);flex:none}
 [hidden]{display:none!important}
 </style></head><body><main>
 <h1>Waib · toimetaja</h1>
@@ -130,6 +132,12 @@ function renderCards(){
    <div><label for="p${k}">Erakond (võib jääda tühjaks)</label><input id="p${k}" data-f="p" value="${esc(c.p)}"></div>
    <div><label for="i${k}">Kaardi tunnus</label><input id="i${k}" data-f="id" value="${esc(c.id)}" ${locked?'readonly':''} maxlength="40"></div>
   </div>
+  <div class="phrow">
+   <img class="phprev" id="pv${k}" alt="" ${c.img?`src="${esc(c.img)}"`:'hidden'}>
+   <div><label for="f${k}">Foto (lõigatakse ruuduks ja vähendatakse automaatselt)</label><input id="f${k}" type="file" accept="image/*" data-photo="1"></div>
+   <div><label for="ic${k}">Foto autor ja litsents (nt Erik Peinar / Riigikogu, CC BY-SA 4.0)</label><input id="ic${k}" data-f="imgc" value="${esc(c.imgc)}"></div>
+   <button class="sm" data-act="nophoto" ${c.img?'':'hidden'}>Eemalda foto</button>
+  </div>
   <label for="c${k}">Väide lihtsas keeles <span class="cnt ${String(c.claim||'').length>170?'long':''}" id="cc${k}">${String(c.claim||'').length} / 170</span></label>
   <textarea id="c${k}" data-f="claim">${esc(c.claim)}</textarea>
   <label for="x${k}">Taust (paar lauset)</label><textarea id="x${k}" data-f="ctx">${esc(c.ctx)}</textarea>
@@ -147,15 +155,31 @@ $('cards').addEventListener('input',e=>{
   if(!locked&&cards[k]._auto){cards[k].id=uniqueId(slug(e.target.value),k);$('i'+k).value=cards[k].id}}
  if(f==='id')cards[k]._auto=false;
 });
+// Foto: keskelt ruuduks, 240 px, JPEG. Suuri faile serverisse ei saadeta.
+function shrink(file){return new Promise((res,rej)=>{
+ const url=URL.createObjectURL(file),im=new Image();
+ im.onload=()=>{try{
+  const w=im.naturalWidth,h=im.naturalHeight,sd=Math.min(w,h),sx=(w-sd)/2,sy=h>w?(h-sd)*0.15:0;
+  const cv=document.createElement('canvas');cv.width=cv.height=240;
+  const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,240,240);cx.drawImage(im,sx,sy,sd,sd,0,0,240,240);
+  URL.revokeObjectURL(url);res(cv.toDataURL('image/jpeg',0.82))}catch(e){rej(e)}};
+ im.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('img'))};im.src=url})}
+$('cards').addEventListener('change',async e=>{
+ if(!e.target.dataset.photo||!e.target.files[0])return;
+ const k=+e.target.closest('[data-k]').dataset.k;
+ try{cards[k].img=await shrink(e.target.files[0]);renderCards();alertMsg('Foto lisatud. Lisa ka autor ja litsents.');$('ic'+k).focus()}
+ catch(err){alertMsg('Seda faili ei õnnestunud pildina avada.',true)}
+});
 $('cards').addEventListener('click',e=>{
  const b=e.target.closest('[data-act]');if(!b)return;const k=+b.closest('[data-k]').dataset.k,a=b.dataset.act;
  if(a==='del')cards.splice(k,1);
+ if(a==='nophoto'){cards[k].img='';cards[k].imgc=''}
  if(a==='up'&&k>0)[cards[k-1],cards[k]]=[cards[k],cards[k-1]];
  if(a==='down'&&k<cards.length-1)[cards[k+1],cards[k]]=[cards[k],cards[k+1]];
  renderCards();
 });
 $('addcard').onclick=()=>{cards.push({id:uniqueId('kaart-'+(cards.length+1),-1),_auto:true,g:'m',p:'',tag:TAGS[0],name:'',role:'',claim:'',ctx:'',date:'',src:'',url:''});renderCards();const b=$('cards').lastElementChild;b.scrollIntoView({behavior:'smooth'});b.querySelector('input').focus()};
-const clean=()=>cards.map(c=>({id:String(c.id||'').trim(),g:c.g||'m',p:String(c.p||'').trim(),tag:c.tag||TAGS[0],name:String(c.name||'').trim(),role:String(c.role||'').trim(),claim:String(c.claim||'').trim(),ctx:String(c.ctx||'').trim(),date:String(c.date||'').trim(),src:String(c.src||'').trim(),url:String(c.url||'').trim()}));
+const clean=()=>cards.map(c=>({id:String(c.id||'').trim(),g:c.g||'m',p:String(c.p||'').trim(),tag:c.tag||TAGS[0],name:String(c.name||'').trim(),role:String(c.role||'').trim(),claim:String(c.claim||'').trim(),ctx:String(c.ctx||'').trim(),date:String(c.date||'').trim(),src:String(c.src||'').trim(),url:String(c.url||'').trim(),img:String(c.img||''),imgc:String(c.imgc||'').trim()}));
 $('exp').onclick=()=>{$('jsonta').value=JSON.stringify(clean(),null,1);$('jsonbox').hidden=false;$('jsonapply').hidden=true;$('jsonta').select()};
 $('imp').onclick=()=>{$('jsonta').value='';$('jsonbox').hidden=false;$('jsonapply').hidden=false;$('jsonta').focus()};
 $('jsonclose').onclick=()=>{$('jsonbox').hidden=true};
@@ -176,7 +200,8 @@ function validate(list){
   if(seen.has(c.id))return w+'tunnus "'+c.id+'" kordub.';seen.add(c.id);
   if(!c.name)return w+'nimi on puudu.';if(!c.claim)return w+'väide on puudu.';
   if(c.url&&!/^https:\/\//.test(c.url))return w+'link peab algama https://';
-  if(!c.url)return w+'allika link on puudu.';}
+  if(!c.url)return w+'allika link on puudu.';
+  if(c.img&&!c.imgc)return w+'fotol on autor ja litsents märkimata.';}
  return '';
 }
 $('savebtn').onclick=async()=>{
