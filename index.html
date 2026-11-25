@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html lang="et"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Waib</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFD60A">
+<meta name="apple-mobile-web-app-title" content="Waib">
 <meta name="description" content="Nädala vaibid: 20 väidet Eesti inforuumist. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <style>
 /* Paigutus: üks kaart korraga; väide ajaleheseriifis, kõik muu süsteemifondis; teemal oma toon */
-:root{--bg:#f3f1ec;--card:#fffdf8;--ink:#1d1d1f;--mut:#6b6a66;--line:#dcd8cf;--pos:#2f7d5b;--neg:#b5523b;--neu:#8a8578;--acc:#2c4a7a;--shadow:0 10px 30px rgba(0,0,0,.12);--disp:"Newsreader",Georgia,"Times New Roman",serif}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#17181a;--card:#222326;--ink:#ecebe7;--mut:#a09e97;--line:#3a3b3f;--pos:#5fb38a;--neg:#e0826a;--neu:#9a968c;--acc:#8fb0e6;--shadow:0 10px 30px rgba(0,0,0,.5)}}
-:root[data-theme=dark]{--bg:#17181a;--card:#222326;--ink:#ecebe7;--mut:#a09e97;--line:#3a3b3f;--pos:#5fb38a;--neg:#e0826a;--neu:#9a968c;--acc:#8fb0e6;--shadow:0 10px 30px rgba(0,0,0,.5)}
+:root{--bg:#f5f3ec;--card:#ffffff;--ink:#111111;--mut:#66645e;--line:#ddd9ce;--pos:#237a52;--neg:#b5462f;--neu:#8a8578;--acc:#111111;--brand:#FFD60A;--onbrand:#111111;--shadow:0 10px 30px rgba(0,0,0,.12);--disp:"Newsreader",Georgia,"Times New Roman",serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111111;--card:#1c1c1c;--ink:#f4f2ea;--mut:#a29f96;--line:#34332f;--pos:#5fb38a;--neg:#e0826a;--neu:#9a968c;--acc:#FFD60A;--brand:#FFD60A;--onbrand:#111111;--shadow:0 10px 30px rgba(0,0,0,.5)}}
+:root[data-theme=dark]{--bg:#111111;--card:#1c1c1c;--ink:#f4f2ea;--mut:#a29f96;--line:#34332f;--pos:#5fb38a;--neg:#e0826a;--neu:#9a968c;--acc:#FFD60A;--brand:#FFD60A;--onbrand:#111111;--shadow:0 10px 30px rgba(0,0,0,.5)}
 *{box-sizing:border-box}html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 #app{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:14px 16px 20px}
 header{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut);gap:8px}
 .seg{display:flex;align-items:flex-end;gap:3px;height:16px;flex:1;max-width:270px}
 .seg i{flex:1;border-radius:2px;background:var(--line);height:4px}
-.seg i.y{background:var(--pos);height:16px}.seg i.n{background:var(--neg);height:8px}.seg i.c{background:var(--acc)}
+.seg i.y{background:var(--pos);height:16px}.seg i.n{background:var(--neg);height:8px}.seg i.c{background:var(--brand);outline:1px solid var(--ink)}
 .seg.big{height:40px;max-width:none;gap:4px;margin-top:12px}.seg.big i{border-radius:3px}.seg.big i.y{height:40px}.seg.big i.n{height:18px}
 .screen{flex:1;display:flex;flex-direction:column}
 .stage{position:relative;flex:1;min-height:500px;margin-top:12px}
@@ -33,18 +39,22 @@ header{display:flex;justify-content:space-between;align-items:center;font-size:1
 .claim{margin:16px 0 0;font-family:var(--disp);font-size:22px;line-height:1.28;font-weight:500;padding-left:12px;border-left:3px solid var(--tc,var(--acc));text-wrap:pretty}
 .ctx{margin:14px 0 0;font-size:14.5px;color:var(--mut)}
 .foot{margin-top:auto;padding-top:12px;display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--mut);border-top:1px solid var(--line)}
-.foot a{color:var(--acc);text-decoration:none;font-weight:600}
+.foot a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-weight:600}
 .stamp{position:absolute;top:18px;padding:4px 10px;border-radius:8px;border:2px solid;font-weight:800;font-size:15px;letter-spacing:.05em;opacity:0;background:var(--card)}
 .stamp.y{right:16px;color:var(--pos);transform:rotate(8deg)}.stamp.n{left:16px;color:var(--neg);transform:rotate(-8deg)}
 .btns{display:flex;gap:10px;margin-top:14px}
 button{font:inherit;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px 14px;cursor:pointer;flex:1}
 button:hover{border-color:var(--acc)}
-button.pri{background:var(--acc);color:var(--bg);border-color:var(--acc);font-weight:600}
+button.pri{background:var(--brand);color:var(--onbrand);border-color:var(--brand);font-weight:700}
+button.pri:hover{border-color:var(--ink)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 button.no{color:var(--neg);font-weight:700}button.yes{color:var(--pos);font-weight:700}
 .btns.top{margin-top:12px}.btns.top button{font-size:19px;padding:12px 10px;border-width:2px;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:16px}
 .btns.top button.no:hover,.btns.top button.no:active{border-color:var(--neg)}.btns.top button.yes:hover,.btns.top button.yes:active{border-color:var(--pos)}
 .em{font-size:34px;line-height:1.1}
 .intro h1,.sum h2{font-family:var(--disp);font-weight:600;text-wrap:balance}
+.intro h1.logo{display:flex;align-items:center;gap:12px;margin:8px 0 14px;padding:16px 18px;border-radius:18px;background:#FFD60A;color:#111;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:58px;line-height:1;letter-spacing:-.03em}
+.intro h1.logo svg{width:60px;height:60px;flex:none}
 .intro h1{font-size:34px;margin:28px 0 10px;line-height:1.1}.intro p{font-size:17px;color:var(--mut);margin:0 0 12px}
 .small{font-size:13px;color:var(--mut)}
 .sum h2{font-size:30px;margin:20px 0 6px}
@@ -69,24 +79,24 @@ button.no{color:var(--neg);font-weight:700}button.yes{color:var(--pos);font-weig
 .dec .s{width:20px;height:20px;display:grid;place-items:center;font-size:15px;margin-top:1px}
 .dec span.q{grid-column:2;color:var(--mut)}
 .dec .ot{grid-column:2;font-size:12.5px;color:var(--mut)}
-.dec a{color:var(--acc);text-decoration:none}
+.dec a{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
 .mini{display:inline-block;vertical-align:middle;width:70px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-right:6px}.mini i{display:block;height:100%;background:var(--pos)}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
 @media (prefers-reduced-motion:reduce){.card.fly,.res,.rx li{transition:none;animation:none}}
 kbd{font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:4px;padding:0 4px}
 .rescard{cursor:default;touch-action:auto;user-select:auto}
 .yours{margin:16px 0 0;font-size:17px}.yours b.y{color:var(--pos)}.yours b.n{color:var(--neg)}
-.oth{margin-top:16px;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--acc) 8%,transparent)}
-.oth .tag{display:block;margin-bottom:8px;color:var(--acc)}
+.oth{margin-top:16px;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--brand) 22%,var(--card))}
+.oth .tag{display:block;margin-bottom:8px;color:var(--ink)}
 .vs{display:flex;justify-content:space-between;font-size:26px;font-weight:800;line-height:1.1}.vs .y{color:var(--pos)}.vs .n{color:var(--neg)}
 .vsbar{height:14px;border-radius:7px;margin-top:8px}
-.timer{height:3px;border-radius:2px;background:var(--line);overflow:hidden}.timer i{display:block;height:100%;width:0;background:var(--acc)}
+.timer{height:3px;border-radius:2px;background:var(--line);overflow:hidden}.timer i{display:block;height:100%;width:0;background:var(--brand)}
 button:disabled{opacity:.5;cursor:default}
 .status{margin:0 0 10px;font-size:14px;color:var(--mut);text-align:center}.status .ok{color:var(--pos)}.status .off{color:var(--neu)}
 button.lnk{flex:none;display:inline;width:auto;padding:0;border:0;background:none;color:var(--acc);text-decoration:underline;font-size:inherit;border-radius:2px}
 .hist{display:flex;align-items:flex-end;gap:3px;height:70px;margin:4px 0 4px}
 .hist i{flex:1;background:var(--neu);opacity:.45;border-radius:2px 2px 0 0;min-height:3px}
-.hist i.me{background:var(--acc);opacity:1}
+.hist i.me{background:var(--brand);opacity:1;outline:1.5px solid var(--ink)}
 a{color:var(--acc)}
 </style></head><body><div id="app"></div>
 <script src="config.js"></script>
@@ -184,11 +194,11 @@ function intro(err){
  :k?`<div class="box" style="margin:6px 0 14px"><b style="font-size:17px">Sul on pooleli: ${k} väidet ${C.length}-st.</b>
  <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Jätka sealt, kus pooleli jäid. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.</p></div>`
  :`<p>Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi. Ära mõtle kaua: loeb esimene tunne.</p>`;
- app.innerHTML=`<div class="screen intro"><span class="tag" style="margin-top:20px">${esc(SET.label||'')}</span><h1 style="margin-top:6px">Waib</h1>
+ app.innerHTML=`<div class="screen intro"><span class="tag" style="margin-top:20px">${esc(SET.label||'')}</span><h1 class="logo" aria-label="Waib"><svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-8 50 50)"><circle cx="50" cy="50" r="50" fill="#111111"></circle><path d="M18 30 L34 72 L50 40 L66 72 L82 30" transform="translate(12 12) scale(0.76)" fill="none" stroke="#FFD60A" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"></path></g></svg><span aria-hidden="true">waib</span></h1>
  ${DEMO?'<p class="small" style="border:1px dashed var(--line);border-radius:10px;padding:8px 10px">Näidisrežiim: server ei ole veel ühendatud. Kaardid on näidised ja koondtulemust ei ole.</p>':''}
  <p><b style="color:var(--ink)">Nädala vaibid.</b> ${C.length} väidet, mida poliitikud ja avaliku elu tegelased on Eesti inforuumis esitanud.</p>
  ${lead}
- ${need||(!k&&!fd)?`<div class="box" style="margin:6px 0 14px;border-color:var(--acc)"><b style="font-size:17px">Me ei tea, kes sa oled.</b>
+ ${need||(!k&&!fd)?`<div class="box" style="margin:6px 0 14px;border-color:var(--brand);background:color-mix(in srgb,var(--brand) 16%,var(--card))"><b style="font-size:17px">Me ei tea, kes sa oled.</b>
  <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Sinu nime ega e-posti aadressi me ei näe. Sinu vastuseid me ei salvesta: liidame need üldarvudele ja unustame kohe. Sisselogimist on vaja ainult selleks, et igaüks saaks vastata ühe korra nädalas.</p></div>`:''}
  ${err?`<p style="color:var(--neg);font-weight:600;margin:0 0 10px" role="alert">${esc(err)}</p>`:''}
  <div style="margin-top:auto">
