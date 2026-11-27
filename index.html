@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#FFD60A">
 <meta name="apple-mobile-web-app-title" content="Waib">
-<meta name="description" content="Nädala vaibid: 20 väidet Eesti inforuumist. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.">
+<meta name="description" content="Nädala vaibid: 20 väidet Eesti inforuumist. Lükka paremale, kui meeldib, ja vasakule, kui ei meeldi.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Playfair+Display:wght@800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <style>
 /* Paigutus: üks kaart korraga; väide ajaleheseriifis, kõik muu süsteemifondis; teemal oma toon */
@@ -194,8 +194,8 @@ function intro(err){
  const lead=fd?`<div class="box" style="margin:6px 0 14px"><b style="font-size:17px">Selle nädala vaibid on sul läbi käidud.</b>
  <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Uus komplekt ilmub reedel. Seni saad vaadata oma kokkuvõtet${sess?' ja seda, kuidas koondtulemus muutub':''}.</p></div>`
  :k?`<div class="box" style="margin:6px 0 14px"><b style="font-size:17px">Sul on pooleli: ${k} väidet ${C.length}-st.</b>
- <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Jätka sealt, kus pooleli jäid. Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi.</p></div>`
- :`<p>Lükka paremale, kui vaibib, ja vasakule, kui ei vaibi. Ära mõtle kaua: loeb esimene tunne.</p>`;
+ <p style="margin:6px 0 0;font-size:15px;color:var(--ink)">Jätka sealt, kus pooleli jäid. Lükka paremale, kui meeldib, ja vasakule, kui ei meeldi.</p></div>`
+ :`<p>Lükka paremale, kui meeldib, ja vasakule, kui ei meeldi. Ära mõtle kaua: vaib on sinu esimene tunne.</p>`;
  app.innerHTML=`<div class="screen intro"><span class="tag" style="margin-top:20px">${esc(SET.label||'')}</span><h1 class="logo" aria-label="Waib"><span class="news" aria-hidden="true">UUDISED</span><span class="tape" aria-hidden="true">waib</span></h1>
  ${DEMO?'<p class="small" style="border:1px dashed var(--line);border-radius:10px;padding:8px 10px">Näidisrežiim: server ei ole veel ühendatud. Kaardid on näidised ja koondtulemust ei ole.</p>':''}
  <p><b style="color:var(--ink)">Nädala vaibid.</b> ${C.length} väidet, mida poliitikud ja avaliku elu tegelased on Eesti inforuumis esitanud.</p>
@@ -205,12 +205,12 @@ function intro(err){
  ${err?`<p style="color:var(--neg);font-weight:600;margin:0 0 10px" role="alert">${esc(err)}</p>`:''}
  <div style="margin-top:auto">
  ${need?`${GCID?`<button class="pri" style="width:100%" id="lgn">Logi sisse Google'iga ja ${k?'jätka':'alusta'}</button>
- <p class="small" style="text-align:center;margin:8px 0 12px">Sisse logides näed iga väite järel koondtulemust: mitmele protsendile vastajatest see vaibis. Nupule vajutades nõustud, et sinu vastused liidetakse anonüümselt üldarvudele; antud vastust ei saa hiljem muuta. <a href="privaatsus.html">Loe täpsemalt</a></p>`:''}
+ <p class="small" style="text-align:center;margin:8px 0 12px">Sisse logides näed iga väite järel koondtulemust: mitmele protsendile vastajatest see meeldis. Nupule vajutades nõustud, et sinu vastused liidetakse anonüümselt üldarvudele; antud vastust ei saa hiljem muuta. <a href="privaatsus.html">Loe täpsemalt</a></p>`:''}
  <button style="width:100%" id="gst">Jätka sisse logimata</button>
  <p class="small" style="text-align:center;margin-top:8px">Sisse logimata koondtulemust ei näe ja sinu vastused jäävad ainult sinu seadmesse.</p>`
  :`${status}<button class="pri" style="width:100%" id="go">${fd?'Vaata oma tulemust':k?`Jätka (${k}/${C.length})`:'Alusta'}</button>
  ${guest&&canLogin?`<button style="width:100%;margin-top:8px" id="lgn">Logi sisse ja vaata koondtulemust</button>`:''}`}
- ${fd?'':'<p class="small" style="text-align:center;margin-top:10px">Klaviatuuril <kbd>←</kbd> 👎 ei vaibi, <kbd>→</kbd> ❤️ vaibib</p>'}
+ ${fd?'':'<p class="small" style="text-align:center;margin-top:10px">Klaviatuuril <kbd>←</kbd> 👎 ei meeldi, <kbd>→</kbd> ❤️ meeldib</p>'}
  <p class="small" style="text-align:center${fd?';margin-top:10px':''}">Väited on allikate põhjal lihtsas keeles ümber sõnastatud, mitte sõnasõnalised tsitaadid.${need?'':' <a href="privaatsus.html">Privaatsus</a>'}</p></div></div>`;
  if($('go'))$('go').onclick=()=>done()?summary():card();
  if($('lgn'))$('lgn').onclick=login;
@@ -229,13 +229,13 @@ function cardHTML(c,front){
  ${front?`<p class="claim">${esc(c.claim)}</p><p class="ctx">${esc(c.ctx||'')}</p>
  ${im&&c.imgc?`<p class="cred">Foto: ${esc(c.imgc)}</p>`:''}
  <div class="foot"><span>${esc(c.date||'')}</span>${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(c.src||'Allikas')} ↗</a>`:`<span>${esc(c.src||'')}</span>`}</div>
- <span class="stamp y" id="sy">❤️ VAIBIB</span><span class="stamp n" id="sn">👎 EI VAIBI</span>`:''}`;
+ <span class="stamp y" id="sy">❤️ MEELDIB</span><span class="stamp n" id="sn">👎 EI MEELDI</span>`:''}`;
 }
 function card(note){
  i=C.findIndex(c=>!(c.id in ans));if(i<0)return summary();
  const c=C[i],nx=C.slice(i+1).find(x=>!(x.id in ans));busy=false;phase='card';
  app.innerHTML=`<header><span>${i+1} / ${C.length}</span>${seg(i)}</header>
- <div class="screen"><div class="btns top"><button class="no" id="bl"><span class="em">👎</span>Ei vaibi</button><button class="yes" id="br"><span class="em">❤️</span>Vaibib</button></div>
+ <div class="screen"><div class="btns top"><button class="no" id="bl"><span class="em">👎</span>Ei meeldi</button><button class="yes" id="br"><span class="em">❤️</span>Meeldib</button></div>
  ${note?`<p style="color:var(--neg);font-weight:600;margin:10px 0 0" role="alert">${esc(note)}</p>`:''}
  <div class="stage" id="stage">${nx?`<div class="card back" style="--tc:${tc(nx.tag)}">${cardHTML(nx,false)}</div>`:''}
  <div class="card" id="cd" style="--tc:${tc(c.tag)}">${cardHTML(c,true)}</div></div></div>`;
@@ -284,10 +284,10 @@ function result(c,v){
   !o.t?'<p style="margin:0;font-size:16px"><b>Oled selle väite esimene vastaja.</b></p><p class="small" style="margin:4px 0 0">Koondtulemus ilmub siia kohe, kui keegi veel vastab.</p>':
   `<div class="vs"><span class="n">👎 ${Math.round((1-o.p)*100)}%</span><span class="y">${Math.round(o.p*100)}% ❤️</span></div>
   <div class="split vsbar"><i class="n" style="width:${(1-o.p)*100}%"></i><i class="y" style="width:${o.p*100}%"></i></div>
-  <p style="margin:10px 0 0;font-size:16px">${o.t===1?'Seni on vastanud üks inimene peale sinu ja tema valik oli '+(o.y?'„vaibib“':'„ei vaibi“')+'.':`Ülejäänud vastajatest oli sinuga sama meelt <b>${Math.round((v?o.p:1-o.p)*100)}%</b>.`}</p>
+  <p style="margin:10px 0 0;font-size:16px">${o.t===1?'Seni on vastanud üks inimene peale sinu ja tema valik oli '+(o.y?'„meeldib“':'„ei meeldi“')+'.':`Ülejäänud vastajatest oli sinuga sama meelt <b>${Math.round((v?o.p:1-o.p)*100)}%</b>.`}</p>
   <p class="small" style="margin:4px 0 0">${o.t===1?'':`Arvesse on võetud ${o.t} vastajat peale sinu. Üksikute inimeste vastuseid ei näe keegi.`}</p>`;
  $('stage').innerHTML=`<div class="card rescard" id="rc" style="--tc:${tc(c.tag)}">${headHTML(c)}
- <p class="yours">Sinu valik: <b class="${v?'y':'n'}">${v?'❤️ Vaibib':'👎 Ei vaibi'}</b></p>
+ <p class="yours">Sinu valik: <b class="${v?'y':'n'}">${v?'❤️ Meeldib':'👎 Ei meeldi'}</b></p>
  <div class="oth"><span class="tag">Vastajad kokku</span>${body}</div>
  <div class="foot" style="border-top:0;display:block"><div class="timer"><i id="tm"></i></div><button class="pri" id="nx" style="width:100%;margin-top:10px">${last?'Vaata kokkuvõtet':'Järgmine'}</button></div></div>`;
  let t=null;
@@ -310,23 +310,23 @@ function summary(){
   if(c.p){const w=pa[c.p]=pa[c.p]||{y:0,n:0};y?w.y++:w.n++}});
  const mx=o=>Math.max(1,...Object.values(o).map(t=>t.y+t.n));
  const rt=t=>t&&t.y+t.n?t.y/(t.y+t.n):null,rv=rt(gr.v),ro=rt(gr.o);
- const note=rv==null||ro==null?'':Math.abs(rv-ro)>=.4?`${rv>ro?'Valitsuse':'Opositsiooni'} inimeste väited vaibisid sulle selgelt sagedamini kui ${rv>ro?'opositsiooni':'valitsuse'} omad.`:'Valitsuse ja opositsiooni väited vaibisid sulle umbes sama sageli.';
+ const note=rv==null||ro==null?'':Math.abs(rv-ro)>=.4?`${rv>ro?'Valitsuse':'Opositsiooni'} inimeste väited meeldisid sulle selgelt sagedamini kui ${rv>ro?'opositsiooni':'valitsuse'} omad.`:'Valitsuse ja opositsiooni väited meeldisid sulle umbes sama sageli.';
  const rows=(o,m,nm,dot)=>Object.entries(o).map(([t,v])=>`<div class="bar"><span>${dot?`<i class="dot" style="background:${tc(t)}"></i>`:''}${esc(nm?nm[t]:t)}</span><span class="small">❤️ ${v.y} · 👎 ${v.n}</span>${split(v.y,v.n,m)}</div>`).join('');
  const grOrdered={};['v','o','m'].forEach(k=>{if(gr[k])grOrdered[k]=gr[k]});
  app.innerHTML=`<div class="screen sum"><span class="tag" style="margin-top:16px">${esc(SET.label||'')}</span><h2 style="margin-top:4px">Sinu nädal</h2>
- <div class="big"><div class="n"><b>👎 ${N}</b>ei vaibinud</div><div class="y"><b>❤️ ${L}</b>vaibis</div></div>
+ <div class="big"><div class="n"><b>👎 ${N}</b>ei meeldinud</div><div class="y"><b>❤️ ${L}</b>meeldis</div></div>
  ${seg(-1,true)}
- <p class="small" style="margin:6px 0 0">Sinu ${C.length} valikut järjest: kõrge tulp vaibis, madal ei vaibinud.</p>
+ <p class="small" style="margin:6px 0 0">Sinu ${C.length} valikut järjest: kõrge tulp meeldis, madal ei meeldinud.</p>
  <h3>Kuhu sa vastajate seas asetud</h3>
  <div class="box" id="cmp"></div>
- <h3>Kelle väited sulle vaibisid</h3>
+ <h3>Kelle väited sulle meeldisid</h3>
  <div class="box">${note?`<p style="margin:0 0 8px;font-size:15px">${esc(note)}</p>`:''}${rows(grOrdered,mx(gr),GN)}</div>
  ${Object.keys(pa).length?`<div class="box">${rows(pa,mx(pa))}</div>`:''}
  <h3>Teemade kaupa</h3>
  <div class="box">${rows(topics,mx(topics),null,true)}</div>
  <h3>Kõik väited</h3>
  <div class="box"><ul class="dec">${C.map(c=>{const u=safeUrl(c.url);return `<li><span class="s">${ans[c.id]?'❤️':'👎'}</span><span><b>${esc(c.name)}</b>${u?` · <a href="${esc(u)}" target="_blank" rel="noopener">${esc(c.src||'Allikas')} ↗</a>`:''}</span><span class="q">${esc(c.claim)}</span><span class="ot" data-ot="${esc(c.id)}"></span></li>`}).join('')}</ul></div>
- <p class="small" style="margin-top:14px">Väited on allikate põhjal lihtsas keeles ümber sõnastatud. Vaib on sinu esimene reaktsioon: väitele, inimesele või mõlemale korraga. See ei ütle, kas väide on tõene. <a href="privaatsus.html">Privaatsus</a></p>
+ <p class="small" style="margin-top:14px">Väited on allikate põhjal lihtsas keeles ümber sõnastatud. Sinu valik on esimene reaktsioon: väitele, inimesele või mõlemale korraga. See ei ütle, kas väide on tõene. <a href="privaatsus.html">Privaatsus</a></p>
  ${DEMO?'<div class="btns"><button class="pri" id="again">Alusta uuesti</button></div>':''}</div>`;
  if(DEMO)$('again').onclick=()=>{ans={};res={};fin=false;store.del(key());card()};
  scrollTo(0,0);
@@ -359,7 +359,7 @@ function draw(box,st,L){
  C.forEach(c=>{const t=cards[c.id];if(!t)return;const y=+t[0]||0,m=y+(+t[1]||0);if(m<2)return;
   const p=y/m;pct[c.id]=p;ag+=ans[c.id]?p:1-p;agN++;
   if(y*2!==m){clear++;if((y*2>m?1:0)===ans[c.id])maj++}});
- document.querySelectorAll('[data-ot]').forEach(el=>{const p=pct[el.dataset.ot];if(p==null)return;el.innerHTML=`<span class="mini"><i style="width:${p*100}%"></i></span>vastajatest vaibis ${Math.round(p*100)}%`});
+ document.querySelectorAll('[data-ot]').forEach(el=>{const p=pct[el.dataset.ot];if(p==null)return;el.innerHTML=`<span class="mini"><i style="width:${p*100}%"></i></span>vastajatest meeldis ${Math.round(p*100)}%`});
  if(n<2||!d.length){
   box.innerHTML=`<b>Oled esimene, kes selle komplekti lõpuni tegi.</b><br><span class="small">Võrdlus ilmub siia kohe, kui keegi teine on samuti kõik ${C.length} väidet läbi käinud.</span>`;
   return;
@@ -367,9 +367,9 @@ function draw(box,st,L){
  const dmax=Math.max(1,...d);
  let tot=0,below=0;d.forEach((x,k)=>{tot+=k*x;if(k<L)below+=x});
  box.innerHTML=`<div class="hist" aria-hidden="true">${d.map((x,k)=>`<i class="${k===L?'me':''}" style="height:${Math.max(4,x/dmax*100)}%"></i>`).join('')}</div>
- <div class="ends"><span>ei vaibi miski</span><span>vaibib kõik</span></div>
+ <div class="ends"><span>ei meeldi miski</span><span>meeldib kõik</span></div>
  <p class="small" style="margin:6px 0 0">Tulbad näitavad, mitu vastajat sai iga tulemuse. Värviline tulp on sinu oma.</p>
- <p style="margin:12px 0 0;font-size:15px">Sulle vaibis <b>${L}</b> väidet ${C.length}-st; vastajatele keskmiselt <b>${(tot/n).toFixed(1).replace('.',',')}</b>. Sulle vaibis rohkem väiteid kui <b>${Math.round(below/n*100)}%</b> vastajatest.</p>
+ <p style="margin:12px 0 0;font-size:15px">Sulle meeldis <b>${L}</b> väidet ${C.length}-st; vastajatele keskmiselt <b>${(tot/n).toFixed(1).replace('.',',')}</b>. Sulle meeldis rohkem väiteid kui <b>${Math.round(below/n*100)}%</b> vastajatest.</p>
  ${agN?`<p style="margin:8px 0 0;font-size:15px">Juhusliku vastajaga langeb sinu valik kokku keskmiselt <b>${Math.round(ag/agN*100)}%</b> väidete puhul${clear?`; enamusega olid samal poolel <b>${maj}</b> väite puhul ${clear}-st`:''}.</p>`:''}
  <p class="small" style="margin:8px 0 0">Lõpuni vastanuid on ${n}, sina kaasa arvatud.</p>`;
 }
