@@ -108,7 +108,7 @@ const app=document.getElementById('app');
 let SET=null,C=[],ans={},res={},fin=false,sess='',guest=false,i=0,busy=false,phase='',advance=null;
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=id=>document.getElementById(id);
-const TC={"Sotsiaalpoliitika":"#c2578f","Riigijuhtimine":"#64748b","Majandus":"#c79a1e","IT":"#16a3b8","Energeetika":"#e0762a","Haridus":"#3d8fd6","Kultuur":"#9b59b6","Riigikaitse":"#7c7a3c","Välispoliitika":"#4b5fc4"};
+const TC={"Sotsiaalpoliitika":"#c2578f","Riigijuhtimine":"#64748b","Majandus":"#c79a1e","IT":"#16a3b8","Energeetika":"#e0762a","Haridus":"#3d8fd6","Kultuur":"#9b59b6","Riigikaitse":"#7c7a3c","Välispoliitika":"#4b5fc4","Popkultuur":"#ff3d8b"};
 const tc=t=>TC[t]||'var(--acc)';
 const GN={v:"Valitsus",o:"Opositsioon",m:"Parteitud, eksperdid ja teised"};
 const store={
